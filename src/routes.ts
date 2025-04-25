@@ -1,15 +1,11 @@
+// src/routes.ts
 import { Router } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import { hash, compare } from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
-import { findUserByUsername, createUser } from "./airtable.ts";
+import { findUserByEmail, createUser } from "./airtable.ts";
+import { renderLoginPage, renderRegisterPage, renderDashboardPage } from "./html.ts";
 import { validatePassword } from "./password.ts";
-import {
-  renderLoginPage,
-  renderRegisterPage,
-  renderDashboardPage,
-} from "./html.ts";
-
 import { appendToLog } from "./logger.ts";
-export { isRateLimited, incrementIpAttempts, getClientIp } from "./utils.ts";
+
 export const router = new Router();
 
 router.get("/", (ctx) => {
@@ -20,16 +16,17 @@ router.get("/", (ctx) => {
 
 router.post("/login", async (ctx) => {
   const formData = await ctx.request.body({ type: "form" }).value;
-  const username = formData.get("username");
+  const email = formData.get("email");
   const password = formData.get("password");
 
-  if (!username || !password) {
+  if (!email || !password) {
     ctx.response.redirect("/?error=1");
     return;
   }
 
-  const user = await findUserByUsername(username);
-  if (!user || !(await compare(password, user.fields.passwordHash))) {
+  const user = await findUserByEmail(email);
+  
+  if (!user || typeof user.fields.passwordHash !== "string" || !(await compare(password, user.fields.passwordHash))) {
     ctx.response.redirect("/?error=1");
     return;
   }
@@ -39,7 +36,7 @@ router.post("/login", async (ctx) => {
 });
 
 router.get("/dashboard", (ctx) => {
-  const auth = ctx.cookies.get("auth");
+  const auth = ctx.cookies.get("auth")
   if (!auth) {
     ctx.response.redirect("/?error=1");
     return;
@@ -62,44 +59,36 @@ router.get("/register", (ctx) => {
 });
 
 router.post("/register", async (ctx) => {
-
-  const ip = ctx.request.ip ?? ctx.request.headers.get("x-forwarded-for") ?? "unknown";
-
   const formData = await ctx.request.body({ type: "form" }).value;
-  const username = formData.get("username");
+  const email = formData.get("email");
   const password = formData.get("password");
 
-  if (!username || !password) {
-    ctx.response.redirect("/register?error=1");
+  if (!email || !password) {
+    ctx.response.redirect("/register?error=missing_fields");
     return;
   }
 
-  const passwordError = validatePassword(password);
-  if (passwordError) {
-    ctx.response.redirect(`/register?error=${encodeURIComponent(passwordError)}`);
+  const passwordCheck = validatePassword(password);
+  if (passwordCheck instanceof Error) {
+    ctx.response.redirect(`/register?error=${encodeURIComponent(passwordCheck.message)}`);
     return;
   }
 
-  const exists = await findUserByUsername(username);
-
-  if (exists) {
-    ctx.response.redirect("/register?error=1");
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    ctx.response.redirect("/register?error=email_taken");
     return;
   }
 
+  const ip = ctx.request.ip ?? ctx.request.headers.get("x-forwarded-for") ?? "unknown";
   const passwordHash = await hash(password);
-
-  const logEntry = appendToLog("", {
+  const log = appendToLog("", {
     timestamp: Date.now(),
     ip,
     action: "register",
     outcome: "success"
   });
 
-
-  await createUser({ username, passwordHash, email: username, log: logEntry });
-
+  await createUser({ email, passwordHash, log });
   ctx.response.redirect("/register?success=1");
 });
-
-

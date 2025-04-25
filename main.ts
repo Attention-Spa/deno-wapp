@@ -9,18 +9,28 @@ const PORT = parseInt(env.PORT || Deno.env.get("PORT") || "8000");
 
 const app = new Application();
 
-app.use(router.routes());
-app.use(router.allowedMethods());
-
 app.use(async (ctx, next) => {
+
   try {
     await next();
   } catch (err) {
+
+    if (typeof err === "object" && err !== null) {
+      const E = Object.fromEntries(Reflect.ownKeys(err).map(k => [k, Reflect.get(err, k)]));
+      console.error({ error: E });
+      return E;
+    }
     console.error("Server error:", err);
     ctx.response.status = 500;
     ctx.response.body = "Internal server error";
   }
 });
 
-console.log(`Server running at http://localhost:${PORT}`);
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+app.addEventListener("listen", () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+
 await app.listen({ port: PORT });
