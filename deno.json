@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "deno.dom",
+      "deno.window",
+      "deno.unstable",
+      "scripthost"
+    ],
+    "types": [
+      "@oak/oak",
+      "deno.ns",
+      "deno.dom",
+      "airtable",
+      "deno.fetch",
+      "deno.net",
+      "deno.crypto",
+      "deno.url",
+      "deno.stream",
+      "deno.fs"
+    ]
+  },
+  "exports": {
+    "./*": "./*",
+    "./mod.ts": "./mod.ts",
+    "./deps.ts": "./deps.ts",
+    "./types.ts": "./types.ts"
+  },
+  "imports": {
+    "oak": "jsr:oak/mod.ts",
+    "@oak/oak": "jsr:@oak/oak@^17.1.4"
+  },
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-* main.ts",
+    "test": "deno test --allow-all",
+    "lint": "deno lint --unstable-*",
+    "fmt": "deno fmt --check --unstable-*",
+    "doc": "deno doc --unstable-*"
+  }
+}
