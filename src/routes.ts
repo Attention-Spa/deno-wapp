@@ -1,7 +1,7 @@
 // src/routes.ts
 import { Router } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import { hash, compare } from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
-import { findUserByEmail, createUser } from "./airtable.ts";
+import { findUserByEmail, createUser } from "./db/airtable.ts";
 import { renderLoginPage, renderRegisterPage, renderDashboardPage } from "./html.ts";
 import { validatePassword } from "./password.ts";
 import { appendToLog } from "./logger.ts";

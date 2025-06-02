@@ -1,4 +1,7 @@
 {
+  "workspace": [
+    
+  ],
   "compilerOptions": {
     "lib": [
       "deno.ns",
@@ -27,7 +30,8 @@
     "./types.ts": "./types.ts"
   },
   "imports": {
-    "oak": "jsr:oak/mod.ts",
+    "dotenv-eval": "npm:dotenv-eval@^0.2.0",
+    "oak": "npm:oak@^9.0.0",
     "@oak/oak": "jsr:@oak/oak@^17.1.4"
   },
   "tasks": {
@@ -36,6 +40,7 @@
     "lint": "deno lint --unstable-*",
     "fmt": "deno fmt --check --unstable-*",
     "doc": "deno doc --unstable-*",
-    "trialrun": "deno run --allow-net --allow-read --allow-write --allow-env ./main.ts --allow-unstable --allow-all --allow-hrtime"
+    "trialrun": "deno run --allow-net --allow-read --allow-write --allow-env ./main.ts --allow-unstable --allow-all --allow-hrtime",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-* dev.ts"
   }
 }

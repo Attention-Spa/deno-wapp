@@ -1,5 +1,5 @@
 import { Airtable } from "https://deno.land/x/airtable@v0.1.0/mod.ts";
-import { config } from "../deps.ts";
+import { config } from "../../deps.ts";
 
 const env = await config();
 const [BaseId, TableName] = env.AIRTABLE_UsersDb_Users_PATH.split("/");
@@ -9,6 +9,9 @@ const airtable = new Airtable({
   endpointUrl: "https://api.airtable.com/v0",
 }).base(BaseId);
 
+export { airtable };
+
+
 const table = airtable.table(TableName);
 
 export async function findUserByEmail(email: string) {
@@ -17,7 +20,7 @@ export async function findUserByEmail(email: string) {
   if (result.length > 0) {
     return result[0].fields;
   }
-  console.log("findUserByEmail", { email,result });
+  console.log("findUserByEmail", { email, result });
   if (result.length === 0) {
     return result || null;
   }
@@ -34,3 +37,5 @@ export async function createUser({
 }) {
   return await table.create({ email, passwordHash, log }, { typecast: true });
 };
+
+export default { Airtable, findUserByEmail, createUser }
