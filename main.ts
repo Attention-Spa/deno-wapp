@@ -197,45 +197,118 @@ function isAuthenticated(request: Request): { authenticated: boolean; user?: { u
   return { authenticated: false };
 }
 
-// HTML templates
 const homePageHTML = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Deno Auth Demo</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .nav { background: #f0f0f0; padding: 10px; margin-bottom: 20px; border-radius: 5px; }
-        .nav a { margin-right: 15px; text-decoration: none; color: #333; font-weight: bold; }
-        .nav a:hover { color: #007acc; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn { background: #007acc; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn:hover { background: #005999; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cyberpunk Portal</title>
+  <style>
+    :root {
+      --bg-color: #0a0a0f;
+      --text-color: #e0e0ff;
+      --primary: #ff00cc;
+      --secondary: #00ffff;
+      --hover-glow: 0 0 10px #ff00cc, 0 0 20px #00ffff;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .nav {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .nav a {
+      color: var(--secondary);
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .nav a:hover {
+      color: var(--primary);
+      text-shadow: var(--hover-glow);
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.15);
+      max-width: 800px;
+      width: 100%;
+    }
+
+    h1 {
+      color: var(--primary);
+      text-shadow: var(--hover-glow);
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #000;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      box-shadow: var(--hover-glow);
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
-    <nav class="nav">
-        <a href="/">Home</a>
-        <a href="/members">Members</a>
-        <a href="/login">Login</a>
-        <a href="/signup">Sign Up</a>
-        <a href="/logout">Logout</a>
-    </nav>
-    
-    <div class="container">
-        <h1>Welcome to Our Website</h1>
-        <p>This is the public homepage. Anyone can view this page.</p>
-        <p>To access the members area, you'll need to log in with valid credentials. New users can create an account with our secure signup process.</p>
-        <p><strong>🔒 Security:</strong> All passwords are securely hashed using PBKDF2 with salt and never stored in plaintext.</p>
-        <a href="/members" class="btn">Try Members Area</a>
-        <a href="/login" class="btn">Login</a>
-        <a href="/signup" class="btn">Sign Up</a>
-    </div>
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/members">Members</a>
+    <a href="/login">Login</a>
+    <a href="/signup">Sign Up</a>
+    <a href="/logout">Logout</a>
+  </nav>
+
+  <div class="container">
+    <h1>👾 Welcome, Net Runner</h1>
+    <p>This is your gateway to the grid. Public access granted. Proceed with caution.</p>
+    <p>Log in to access restricted zones. New users can jack in via secure registration.</p>
+    <p><strong>🔐 Security Protocol:</strong> Encrypted credentials, salted and hashed using PBKDF2. No plaintext vulnerabilities.</p>
+    <a href="/members" class="btn">Access Grid</a>
+    <a href="/login" class="btn">Log In</a>
+    <a href="/signup" class="btn">Jack In</a>
+  </div>
 </body>
 </html>
 `;
+
 
 const membersPageHTML = (user: { email: string }) => `
 <!DOCTYPE html>
@@ -428,12 +501,13 @@ async function handler(request: Request): Promise<Response> {
 
   // Handle routes
   switch (path) {
-    case "/":
+    case "/": {
       return new Response(homePageHTML, {
         headers: { "content-type": "text/html" },
       });
+    }
 
-    case "/members":
+    case "/members": {
       const auth = isAuthenticated(request);
       if (!auth.authenticated) {
         return new Response(null, {
@@ -444,8 +518,9 @@ async function handler(request: Request): Promise<Response> {
       return new Response(membersPageHTML(auth.user!), {
         headers: { "content-type": "text/html" },
       });
+    }
 
-    case "/login":
+    case "/login": {
       if (request.method === "GET") {
         return new Response(loginPageHTML, {
           headers: { "content-type": "text/html" },
@@ -485,8 +560,9 @@ async function handler(request: Request): Promise<Response> {
         }
       }
       break;
+    }
 
-    case "/signup":
+    case "/signup": {
       if (request.method === "GET") {
         return new Response(signupPageHTML, {
           headers: { "content-type": "text/html" },
@@ -547,8 +623,9 @@ async function handler(request: Request): Promise<Response> {
         }
       }
       break;
+    }
 
-    case "/logout":
+    case "/logout": {
       const cookies = getCookies(request.headers);
       const sessionId = cookies.sessionId;
       
@@ -563,9 +640,11 @@ async function handler(request: Request): Promise<Response> {
 
       deleteCookie(response.headers, "sessionId");
       return response;
+    }
 
-    default:
+    default: {
       return new Response("404 Not Found", { status: 404 });
+    }
   }
 
   return new Response("500 Internal Server Error", { status: 500 });

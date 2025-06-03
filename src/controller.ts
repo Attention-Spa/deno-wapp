@@ -30,7 +30,7 @@ const searchUser = async (params: Partial<User>) => {
         filterByFormula: `LOWER({email}) = '${params.email?.toLowerCase()}'`
     });
 
-    const records = query.records?.map(r => loadRecord(r, Object.assign(UserTbl,{fields:UserTbl.})   ))
+    const records = query.records?.map(r => loadRecord(r, Object.assign(UserTbl, { fields: UserTbl })))
 
 };
 

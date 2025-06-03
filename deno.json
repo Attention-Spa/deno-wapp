@@ -1,7 +1,4 @@
 {
-  "workspace": [
-    
-  ],
   "compilerOptions": {
     "lib": [
       "deno.ns",
@@ -21,12 +18,32 @@
       "deno.url",
       "deno.stream",
       "deno.fs"
-    ]
+    ],
+    "allowUnusedLabels": true,
+    "allowUnreachableCode": true
+  },
+  "lint": {
+    "include": [
+      "src/",
+      "src/../.ts"
+    ],
+    "exclude": [
+      ".env",
+      "*.js"
+    ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ],
+      "exclude": [
+        "no-unused-vars"
+      ]
+    }
   },
   "exports": {
-    "./*": "./*",
-    "./mod.ts": "./mod.ts",
-    "./deps.ts": "./deps.ts",
     "./types.ts": "./types.ts"
   },
   "imports": {

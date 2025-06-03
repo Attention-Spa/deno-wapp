@@ -36,7 +36,7 @@ export function fullyLoadAirtableRecord(record, table) {
 
             const keyCheck = fieldRefs?.[key.toString().toLowerCase()]?.name;
 
-            if (!!keyCheck)
+            if (keyCheck)
                 return target[keyCheck];
 
         }
